@@ -11,26 +11,17 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Spring Security configuration class.
- * <p>This class configures HTTP security, basic authentication, and user details
- * for the Employee Leave Management System.</p>
- * <p>Key features:</p>
- * <ul>
- *     <li>Disables CSRF for simplicity (not recommended for production without proper consideration).</li>
- *     <li>Permits unrestricted access to Swagger UI, API documentation, and H2 console.</li>
- *     <li>Restricts all "/api/**" endpoints to users with the MANAGER role.</li>
- *     <li>Enables HTTP Basic authentication.</li>
- *     <li>Disables frame options to allow H2 console rendering in a browser frame.</li>
- * </ul>
+ * Configures application security using Spring Security.
+ * <p>
+ * Sets up HTTP Basic authentication, endpoint access rules,
+ * and an in-memory user store with Employee and Manager roles.
+ * </p>
  */
 @Configuration
 public class SecurityConfig {
 
     /**
-     * Configures the HTTP security filter chain.
-     * @param http HttpSecurity object provided by Spring Security
-     * @return SecurityFilterChain configured for this application
-     * @throws Exception if there is a configuration error
+     * Configures HTTP security, including endpoint access rules and CSRF settings.
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
@@ -40,10 +31,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/api-docs/**",
                                 "/h2-console/**"
                         ).permitAll()
-                        .requestMatchers("/api/**").hasRole("MANAGER")
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/employees/**").hasAnyRole("EMPLOYEE","MANAGER")
+                        .requestMatchers("/api/leaves/apply","/api/leaves/history/**","/api/leaves/pending").hasRole("EMPLOYEE")
+                        .requestMatchers("/api/manager/**").hasRole("MANAGER")
+                        .anyRequest().denyAll())
                         .httpBasic(Customizer.withDefaults());
         // Disable X-Frame-Options to allow H2 console to be displayed in browser
         http.headers(headers->headers.frameOptions(frame->frame.disable()));
@@ -51,10 +45,7 @@ public class SecurityConfig {
     }
 
     /**
-     * Defines an in-memory user for testing purposes.
-     * <p>The application uses an in-memory user with username "manager" and password "123".
-     * The user has the role MANAGER.</p
-     * @return UserDetailsService with the configured in-memory user
+     * Provides an in-memory user store with one Employee and one Manager user.
      */
     @Bean
     public UserDetailsService userDetailsService(){
@@ -63,6 +54,12 @@ public class SecurityConfig {
                 .password("{noop}123")
                 .roles("MANAGER")
                 .build();
-        return new InMemoryUserDetailsManager(manager);
+
+        UserDetails employee =User.builder()
+                .username("employee")
+                .password("{noop}123")
+                .roles("EMPLOYEE")
+                .build();
+        return new InMemoryUserDetailsManager(manager,employee);
     }
 }

@@ -1,74 +1,65 @@
 package com.example.EmployeeLeaveManagement.controller;
 
 import com.example.EmployeeLeaveManagement.dto.LeaveRequestDTO;
-import com.example.EmployeeLeaveManagement.service.LeaveRequestService;
+import com.example.EmployeeLeaveManagement.service.ManagerServiceInterface;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller for manager-specific leave operations.
- * <p>This controller provides endpoints for managers to:</p>
- * <ul>
- *     <li>Approve leave requests</li>
- *     <li>Reject leave requests</li>
- *     <li>View all pending leave requests</li>
- * </ul>
- *
- * <p>All business logic is delegated to {@link LeaveRequestService}.</p>
+ * REST controller for Manager operations on Employee Leave Requests.
+ * <p>
+ * Provides endpoints for approving or rejecting leave requests
+ * and retrieving all pending leave requests for managerial review.
+ * </p>
  */
 @RestController
 @RequestMapping("/api/manager")
 public class ManagerController{
 
-    private final LeaveRequestService leaveRequestService;
+    private final ManagerServiceInterface managerService;
 
-    /**
-     * Constructor for ManagerController.
-     * @param leaveRequestService Service layer handling leave request operations
-     */
-    public ManagerController(LeaveRequestService leaveRequestService) {
-        this.leaveRequestService = leaveRequestService;
+    public ManagerController(ManagerServiceInterface managerService){
+        this.managerService=managerService;
     }
 
     /**
-     * Approve a pending leave request.
-     * <p>Updates the status of the leave request to Approved and deducts the leave days
-     * from the employee's leave balance if sufficient.</p>
-     * @param leaveRequestId ID of the leave request to approve
-     * @return ResponseEntity containing LeaveRequestDTO with updated status
-     * @throws com.example.EmployeeLeaveManagement.exception.CustomException if the leave request
-     *         does not exist, is already processed, or has insufficient leave balance
+     * Approve a specific leave request.
+     *
+     * @param leaveRequestId the ID of the leave request to approve
+     * @return the updated leave request after approval
      */
     @PatchMapping("/approve/{leaveRequestId}")
     public ResponseEntity<LeaveRequestDTO> approveLeave(@PathVariable Long leaveRequestId){
-        LeaveRequestDTO dto=leaveRequestService.approveLeaveByManager(leaveRequestId);
-        return ResponseEntity.ok(dto);
+        LeaveRequestDTO response=managerService.approveLeave(leaveRequestId);
+        return ResponseEntity.ok(response);
     }
 
     /**
-     * Reject a pending leave request.
-     * <p>Updates the status of the leave request to Rejected. No changes are made
-     * to the employee's leave balance.</p>
-     * @param leaveRequestId ID of the leave request to reject
-     * @return ResponseEntity containing LeaveRequestDTO with updated status
-     * @throws com.example.EmployeeLeaveManagement.exception.CustomException if the leave request
-     *         does not exist or is already processed
+     * Reject a specific leave request.
+     *
+     * @param leaveRequestId the ID of the leave request to reject
+     * @return the updated leave request after rejection
      */
     @PatchMapping("/reject/{leaveRequestId}")
     public ResponseEntity<LeaveRequestDTO> rejectLeave(@PathVariable Long leaveRequestId){
-        LeaveRequestDTO dto=leaveRequestService.rejectLeaveByManager(leaveRequestId);
-        return ResponseEntity.ok(dto);
+        LeaveRequestDTO response=managerService.rejectLeave(leaveRequestId);
+        return ResponseEntity.ok(response);
     }
 
     /**
-     * Retrieve all pending leave requests.
-     * <p>This endpoint allows managers to view all leave requests with status Pending.</p>
-     * @return ResponseEntity containing a list of LeaveRequestDTO with Pending status
+     * Retrieve all pending leave requests with pagination.
+     *
+     * @param page the page number (default 0)
+     * @param size the page size (default 10)
+     * @return a list of pending leave requests
      */
     @GetMapping("/pending")
-    public ResponseEntity<List<LeaveRequestDTO>> getPendingLeaves(){
-        List<LeaveRequestDTO> pending=leaveRequestService.getPendingLeaves();
+    public ResponseEntity<List<LeaveRequestDTO>> getPendingLeaves(
+            @RequestParam(defaultValue = "0")int page,
+            @RequestParam(defaultValue = "10")int size
+    ){
+        List<LeaveRequestDTO> pending =managerService.getPendingLeaves(page,size);
         return ResponseEntity.ok(pending);
     }
 }

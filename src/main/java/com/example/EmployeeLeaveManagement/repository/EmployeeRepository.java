@@ -16,4 +16,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Custom queries can also be defined here if needed.</p>
  */
 public interface EmployeeRepository extends JpaRepository<Employee,Long> {
+    boolean existsByEmailIgnoreCase(String email);
 }

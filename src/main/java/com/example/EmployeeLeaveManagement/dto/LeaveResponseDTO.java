@@ -6,31 +6,47 @@ import lombok.Data;
 import java.time.LocalDate;
 
 /**
- * Data Transfer Object (DTO) representing a leave request response.
- * <p>This DTO is used to return leave request details to the client,
- * typically after applying, approving, rejecting, or fetching leave history.</p>
+ * Data Transfer Object (DTO) representing the response details of a leave request.
+ * <p>
+ * This DTO is used to send leave request information to clients.
+ * All fields are read-only and reflect the current state of the leave request.
+ * </p>
  */
 @Data
 public class LeaveResponseDTO {
 
-    /** Unique identifier of the leave request */
+    /**
+     * Unique identifier of the leave request.
+     */
     private Long leaveId;
 
-    /** ID of the employee who submitted the leave request */
+    /**
+     * ID of the employee who submitted the leave request.
+     */
     private Long employeeId;
 
-    /** Type of leave requested (Casual, Sick, Birthday) */
+    /**
+     * Type of leave requested (e.g., Casual, Sick, Birthday).
+     */
     private LeaveTypeEnum leaveType;
 
-    /** Start date of the leave */
+    /**
+     * Start date of the leave.
+     */
     private LocalDate startDate;
 
-    /** End date of the leave */
+    /**
+     * End date of the leave.
+     */
     private LocalDate endDate;
 
-    /** Total number of leave days */
+    /**
+     * Total number of leave days.
+     */
     private int numberOfDays;
 
-    /** Current status of the leave request (Pending, Approved, Rejected) */
+    /**
+     * Current status of the leave request (e.g., PENDING, APPROVED, REJECTED).
+     */
     private LeaveStatus status;
 }

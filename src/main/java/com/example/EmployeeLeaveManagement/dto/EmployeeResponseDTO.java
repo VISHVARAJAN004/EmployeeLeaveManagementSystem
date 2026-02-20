@@ -1,60 +1,61 @@
 package com.example.EmployeeLeaveManagement.dto;
 
-import com.example.EmployeeLeaveManagement.entity.Employee;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDate;
 
-
 /**
- * Data Transfer Object (DTO) representing an Employee response.
- * <p>This DTO is used to send employee details to the client, including
- * their leave balances for Casual, Sick, and Birthday leaves.</p>
+ * Data Transfer Object for sending Employee details in responses.
+ * <p>
+ * Contains all relevant employee information including personal details,
+ * role, and leave balances.
+ * </p>
  */
 @Data
 public class EmployeeResponseDTO {
 
-    /** Unique identifier of the employee */
+    /**
+     * Unique identifier of the employee.
+     */
     private long id;
 
-    /** Name of the employee */
+    /**
+     * Name of the employee.
+     */
     private String name;
 
-    /** Email of the employee */
+    /**
+     * Email of the employee.
+     */
     private String email;
 
-    /** Date of birth of the employee, formatted as yyyy-MM-dd */
+    /**
+     * Date of birth of the employee.
+     * <p>
+     * Serialized in JSON using the format "yyyy-MM-dd".
+     * </p>
+     */
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
-    /** Role of the employee (e.g., Employee, Manager) */
+    /**
+     * Role of the employee (e.g., EMPLOYEE, MANAGER).
+     */
     private String role;
 
-    /** Remaining casual leave days */
+    /**
+     * Number of casual leave days available for the employee.
+     */
     private int casualLeave;
 
-    /** Remaining sick leave days */
+    /**
+     * Number of sick leave days available for the employee.
+     */
     private int sickLeave;
 
-    /** Remaining birthday leave days */
-    private int birtdayLeave;
-
     /**
-     * Constructor to create EmployeeResponseDTO from an Employee entity and leave balances.
-     *
-     * @param emp Employee entity
-     * @param casualLeave Remaining casual leave days
-     * @param sickLeave Remaining sick leave days
-     * @param birtdayLeave Remaining birthday leave days
+     * Number of birthday leave days available for the employee.
      */
-    public EmployeeResponseDTO(Employee emp,int casualLeave,int sickLeave,int birtdayLeave){
-        this.id=emp.getId();
-        this.name=emp.getName();
-        this.email=emp.getEmail();
-        this.dateOfBirth=emp.getDateOfBirth();
-        this.role=emp.getRole().name();
-        this.casualLeave=casualLeave;
-        this.sickLeave=sickLeave;
-        this.birtdayLeave=birtdayLeave;
-    }
+    private int birthdayLeave;
+
 }

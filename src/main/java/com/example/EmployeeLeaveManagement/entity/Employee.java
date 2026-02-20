@@ -6,37 +6,51 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 
-
 /**
- * Entity representing an Employee in the HRMS system.
- * <p>This entity is mapped to the database and stores the basic
- * information of an employee, including their role and status.</p>
+ * Entity representing an Employee in the system.
+ * <p>
+ * This entity stores personal information, role, and status of an employee.
+ * It is mapped to the database table automatically by JPA/Hibernate.
+ * </p>
  */
 @Entity
 @Data
 public class Employee {
 
-    /** Unique identifier of the employee, auto-generated */
+    /**
+     * Unique identifier for the employee.
+     * Generated automatically by the database.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    /** Full name of the employee */
+    /**
+     * Name of the employee.
+     */
     private String name;
 
-
-    /** Email address of the employee, must be unique */
+    /**
+     * Email of the employee.
+     * Must be unique across all employees.
+     */
     @Column(unique=true)
     private String email;
 
-    /** Date of birth of the employee */
+    /**
+     * Date of birth of the employee.
+     */
     private LocalDate dateOfBirth;
 
-    /** Role of the employee (Employee or Manager) */
+    /**
+     * Role of the employee in the system (e.g., EMPLOYEE, MANAGER).
+     */
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    /** Status of the employee (Active or Inactive) */
+    /**
+     * Employment status of the employee (e.g., ACTIVE, INACTIVE).
+     */
     @Enumerated(EnumType.STRING)
     private EmployeeStatus status;
 }
