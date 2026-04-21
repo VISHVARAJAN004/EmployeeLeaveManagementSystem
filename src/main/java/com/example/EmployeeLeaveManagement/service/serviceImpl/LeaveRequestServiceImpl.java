@@ -161,7 +161,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
         lr.setStatus(LeaveStatus.Approved);
         LeaveRequest updated =leaveRequestRepository.save(lr);
-        log.info("Leave request ID {} approved succcessfully",leaveRequestId);
+        log.info("Leave request ID {} approved successfully",leaveRequestId);
         return leaveRequestMapper.toDto(updated);
     }
 

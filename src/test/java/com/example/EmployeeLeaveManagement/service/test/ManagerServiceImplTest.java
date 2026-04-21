@@ -110,7 +110,7 @@ public class ManagerServiceImplTest {
         when(leaveRequestRepository.findById(1L)).thenReturn(Optional.empty());
 
         CustomException ex = assertThrows(CustomException.class, () -> managerService.approveLeave(1L));
-        assertEquals("Leave requst nor found", ex.getMessage());
+        assertEquals("Leave request nor found", ex.getMessage());
     }
 
 

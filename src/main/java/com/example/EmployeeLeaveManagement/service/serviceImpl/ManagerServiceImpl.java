@@ -1,11 +1,13 @@
 package com.example.EmployeeLeaveManagement.service.serviceImpl;
 
 import com.example.EmployeeLeaveManagement.dto.LeaveRequestDTO;
+import com.example.EmployeeLeaveManagement.entity.Employee;
 import com.example.EmployeeLeaveManagement.entity.LeaveBalance;
 import com.example.EmployeeLeaveManagement.entity.LeaveRequest;
 import com.example.EmployeeLeaveManagement.enums.LeaveStatus;
 import com.example.EmployeeLeaveManagement.exception.CustomException;
 import com.example.EmployeeLeaveManagement.mapper.LeaveRequestMapper;
+import com.example.EmployeeLeaveManagement.repository.EmployeeRepository;
 import com.example.EmployeeLeaveManagement.repository.LeaveBalanceRepository;
 import com.example.EmployeeLeaveManagement.repository.LeaveRequestRepository;
 import com.example.EmployeeLeaveManagement.service.ManagerServiceInterface;
@@ -30,14 +32,16 @@ public class ManagerServiceImpl implements ManagerServiceInterface {
     private final LeaveRequestRepository leaveRequestRepository;
     private final LeaveBalanceRepository leaveBalanceRepository;
     private final LeaveRequestMapper leaveRequestMapper;
+    private final EmployeeRepository employeeRepository;
 
     /**
      * Constructor for ManagerServiceImpl.
      */
-    public ManagerServiceImpl(LeaveRequestRepository leaveRequestRepository, LeaveBalanceRepository leaveBalanceRepository, LeaveRequestMapper leaveRequestMapper) {
+    public ManagerServiceImpl(LeaveRequestRepository leaveRequestRepository, LeaveBalanceRepository leaveBalanceRepository, LeaveRequestMapper leaveRequestMapper,EmployeeRepository employeeRepository) {
         this.leaveRequestRepository = leaveRequestRepository;
         this.leaveBalanceRepository = leaveBalanceRepository;
         this.leaveRequestMapper = leaveRequestMapper;
+        this.employeeRepository=employeeRepository;
     }
 
     /**
@@ -53,7 +57,7 @@ public class ManagerServiceImpl implements ManagerServiceInterface {
         LeaveRequest lr = leaveRequestRepository.findById(leaveRequestId)
                 .orElseThrow(() -> {
                     log.error("Leave request not found with ID: {}", leaveRequestId);
-                    return new CustomException("Leave requst nor found");
+                    return new CustomException("Leave request not found");
                 });
 
         if (lr.getStatus() != LeaveStatus.Pending) {
@@ -125,4 +129,17 @@ public class ManagerServiceImpl implements ManagerServiceInterface {
                 .map(leaveRequestMapper::toDto)
                 .getContent();
     }
+
+    @Transactional
+    public void deleteEmployee(Long employeeId) {
+        Employee emp = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new CustomException("Employee not found with id " + employeeId));
+
+        leaveRequestRepository.deleteByEmployee(emp);
+        leaveBalanceRepository.deleteByEmployee(emp);
+
+        employeeRepository.delete(emp);
+        log.info("Employee with id {} deleted successfully", employeeId);
+    }
+
 }

@@ -20,4 +20,6 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest,Long>
 
     List<LeaveRequest> findByEmployee(Employee employee);
 
+    void deleteByEmployee(Employee employee);
+
 }

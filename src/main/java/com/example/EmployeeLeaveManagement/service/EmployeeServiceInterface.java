@@ -37,5 +37,9 @@ public interface EmployeeServiceInterface {
      * @return Page of EmployeeResponseDTO representing employees
      */
     Page<EmployeeResponseDTO> getAllEmployees(int page,int size);
+
+    EmployeeResponseDTO updateEmployee(Long id,EmployeeDTO dto);
+
+
 }
 

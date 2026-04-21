@@ -36,4 +36,6 @@ public interface ManagerServiceInterface {
      * @return List of LeaveRequestDTO representing pending leaves
      */
     List<LeaveRequestDTO> getPendingLeaves(int page,int size);
+
+    void deleteEmployee(Long employeeId);
 }

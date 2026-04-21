@@ -111,6 +111,29 @@ public class EmployeeServiceImpl implements EmployeeServiceInterface {
                 .map(employeeMapper::toDto);
     }
 
+    @Override
+    public EmployeeResponseDTO updateEmployee(Long id, EmployeeDTO dto){
+        log.debug("Updating employee with id {}",id);
+
+        Employee emp = employeeRepository.findById(id)
+                .orElseThrow(() -> new CustomException("Employee not found with id " + id));
+
+        if(!emp.getEmail().equalsIgnoreCase(dto.getEmail()) &&
+                employeeRepository.existsByEmailIgnoreCase(dto.getEmail())){
+            throw new CustomException("Employee with email "+dto.getEmail()+" already exists");
+        }
+
+        emp.setName(dto.getName());
+        emp.setEmail(dto.getEmail());
+        emp.setDateOfBirth(dto.getDateOfBirth());
+
+        employeeRepository.save(emp);
+
+        log.info("Employee {} updated successfully",emp.getName());
+
+        return mapToResponse(emp);
+    }
+
     /**
      * Initializes leave balance for a given employee and leave type.
      */
@@ -147,7 +170,6 @@ public class EmployeeServiceImpl implements EmployeeServiceInterface {
     /**
      * Gets remaining leave days for an employee and leave type.
      */
-
     private int getLeaveDays(Employee emp,String leaveName){
         return leaveBalanceRepository
                 .findByEmployeeAndLeaveType_Name(emp,leaveName)

@@ -1,9 +1,11 @@
 package com.example.EmployeeLeaveManagement.config;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,7 +27,9 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
-        http.csrf(csrf->csrf.disable())
+        http.csrf(csrf-> csrf.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers(
                                 "/swagger-ui.html",
@@ -34,16 +38,17 @@ public class SecurityConfig {
                                 "/api-docs/**",
                                 "/h2-console/**"
                         ).permitAll()
-                        .requestMatchers("/api/employees/**").hasAnyRole("EMPLOYEE","MANAGER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/manager/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/manager/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/manager/**").hasRole("MANAGER")
+                        .requestMatchers("/api/employees","/api/employees/**").hasAnyRole("EMPLOYEE","MANAGER")
                         .requestMatchers("/api/leaves/apply","/api/leaves/history/**","/api/leaves/pending").hasRole("EMPLOYEE")
-                        .requestMatchers("/api/manager/**").hasRole("MANAGER")
                         .anyRequest().denyAll())
                         .httpBasic(Customizer.withDefaults());
         // Disable X-Frame-Options to allow H2 console to be displayed in browser
         http.headers(headers->headers.frameOptions(frame->frame.disable()));
         return http.build();
     }
-
     /**
      * Provides an in-memory user store with one Employee and one Manager user.
      */

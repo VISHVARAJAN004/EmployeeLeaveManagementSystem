@@ -2,6 +2,7 @@ package com.example.EmployeeLeaveManagement.controller;
 
 import com.example.EmployeeLeaveManagement.dto.LeaveRequestDTO;
 import com.example.EmployeeLeaveManagement.service.ManagerServiceInterface;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/manager")
+@SecurityRequirement(name="basicAuth")
 public class ManagerController{
 
     private final ManagerServiceInterface managerService;
@@ -61,5 +63,11 @@ public class ManagerController{
     ){
         List<LeaveRequestDTO> pending =managerService.getPendingLeaves(page,size);
         return ResponseEntity.ok(pending);
+    }
+
+    @DeleteMapping("/delete/employee/{employeeId}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long employeeId){
+        managerService.deleteEmployee(employeeId);
+        return ResponseEntity.ok("Employee deleted successfully");
     }
 }
